@@ -6,12 +6,13 @@ $endY = 670
 # $scrollBarX = 22 # <- adjust endX
 $maxBar = 4
 $lines = 24 # 12 == 1 octave
-$notes = $maxBar*$shortestNote
+# $notes = $maxBar*$shortestNote
+$notes = 64
 $shortestNote = 16 # 16 == 1/16, 8 == 1/8
 $longestNote = 2
 # $elevation = 410 # the height of the lowest note <- adjust endY
-$xGap = ($endX - $startX) / $notes
-$yGap = ($endY - $startY) / $lines
+$xGap = ($endX-$startX)/$notes
+$yGap = ($endY-$startY)/$lines
 $interval = 10 # msec
 
 # click L
@@ -30,6 +31,9 @@ function move-mouse ($mx, $my, $ms) {
 function vardump ($x, $y) {
     write-host $x X
     write-host $y Y
+    write-host $notes notes
+    write-host $xGap xGap
+    write-host $yGap yGap
 }
 
 # declare .NET Framework
@@ -56,7 +60,8 @@ for ($i=0; $i -le $notes; $i++){
     # if (($i -ge 5) -And ($i -le 10)) { $y2 = $y + $yi }
     move-mouse $x2 $y2 $interval
     click-L $interval
-    vardump $x2 $y2 $interval
+    # vardump $x2 $y2 $interval
+    Write-Host $num NUM
 }
 
 Start-Sleep -m 300
