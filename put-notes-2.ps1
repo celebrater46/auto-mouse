@@ -1,25 +1,30 @@
 ﻿# default mouse cursor's location
-$startX = 84
-$startY = 150
-$endX = 1898
-$endY = 670
+[int] $startX = 84
+[int] $startY = 150
+[int] $endX = 1898
+[int] $endY = 670
 # $scrollBarX = 22 # <- adjust endX
-$maxBar = 4
-$lines = 24 # 12 == 1 octave
-# $notes = $maxBar*$shortestNote
-$notes = 64
-$shortestNote = 16 # 16 == 1/16, 8 == 1/8
-$longestNote = 2
+[int] $maxBar = 4
+[int] $lines = 14 # 7 == 1 octave
+[int] $fullLines = 24 # 12 == 1 octave
+[int[]] $linesArray = @(0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23)
+[int] $shortestNote = 8 # 16 == 1/16, 8 == 1/8
+[int] $longestNote = 2
+[int] $notes = $maxBar * $shortestNote
+# [int] $notes = 16
 # $elevation = 410 # the height of the lowest note <- adjust endY
-$xGap = ($endX-$startX)/$notes
-$yGap = ($endY-$startY)/$lines
-$interval = 10 # msec
+[int] $xGap = ($endX-$startX)/$notes
+[int] $yGap = ($endY-$startY)/$fullLines
+[int] $interval = 3 # msec
 
 # click L
 function click-L ($ms) {
-    $SendMouseClick::mouse_event(0x0002, 0, 0, 0, 0);
-    $SendMouseClick::mouse_event(0x0004, 0, 0, 0, 0);
-    Start-Sleep -m $ms
+    $blankProbability = Get-Random -Maximum 300 -Minimum 1 # if the num is less than 100, no note
+    if ($blankProbability -gt 100) {
+        $SendMouseClick::mouse_event(0x0002, 0, 0, 0, 0);
+        $SendMouseClick::mouse_event(0x0004, 0, 0, 0, 0);
+        Start-Sleep -m $ms
+    }
 }
 
 # move the cursor
@@ -53,9 +58,10 @@ $SendMouseClick = Add-Type -memberDefinition $signature -name "Win32MouseEventNe
 Start-Sleep -m 3000
 
 for ($i=0; $i -le $notes; $i++){
-    $num = Get-Random -Maximum 24 -Minimum 1
-    $x2 = $i * $xGap + $startX
-    $y2 = $endY - ($yGap * $num)
+    [int] $num = Get-Random -Maximum $lines -Minimum 1
+    [int] $x2 = $i * $xGap + $startX
+    # $y2 = $endY - ($yGap * $num)
+    [int] $y2 = $endY - ($yGap * $linesArray[$num-1])
     # if ($i -ge 15) { $y2 = $y + $yi }
     # if (($i -ge 5) -And ($i -le 10)) { $y2 = $y + $yi }
     move-mouse $x2 $y2 $interval
