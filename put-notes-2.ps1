@@ -6,11 +6,12 @@ $endY = 670
 # $scrollBarX = 22 # <- adjust endX
 $maxBar = 4
 $lines = 24 # 12 == 1 octave
+$notes = $maxBar*$shortestNote
 $shortestNote = 16 # 16 == 1/16, 8 == 1/8
 $longestNote = 2
 # $elevation = 410 # the height of the lowest note <- adjust endY
-$xGap = ($endX-$startX)/($maxBar*$shortestNote)
-$yGap = ($endY-$startY)/$lines
+$xGap = ($endX - $startX) / $notes
+$yGap = ($endY - $startY) / $lines
 $interval = 10 # msec
 
 # click L
@@ -47,9 +48,10 @@ $SendMouseClick = Add-Type -memberDefinition $signature -name "Win32MouseEventNe
 [System.Windows.Forms.SendKeys]::SendWait("%{TAB}")
 Start-Sleep -m 3000
 
-for ($i=0; $i -le 120; $i++){
-    $x2 = $i * $xGap + $x
-    $y2 = Get-Random -Maximum 800 -Minimum 360
+for ($i=0; $i -le $notes; $i++){
+    $num = Get-Random -Maximum 24 -Minimum 1
+    $x2 = $i * $xGap + $startX
+    $y2 = $endY - ($yGap * $num)
     # if ($i -ge 15) { $y2 = $y + $yi }
     # if (($i -ge 5) -And ($i -le 10)) { $y2 = $y + $yi }
     move-mouse $x2 $y2 $interval
