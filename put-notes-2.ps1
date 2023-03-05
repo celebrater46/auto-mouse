@@ -18,8 +18,9 @@
 # $elevation = 410 # the height of the lowest note <- adjust endY
 [int] $xGap = ($endX-$startX)/$notes
 [int] $yGap = ($endY-$startY)/$fullLines
-[int] $interval = 3 # msec
-[int] $times = 4
+[int] $interval = 1 # msec 
+[int] $tempo = 120
+[int] $times = 3
 
 # click L
 function click-L ($ms) {
@@ -61,17 +62,18 @@ $SendMouseClick = Add-Type -memberDefinition $signature -name "Win32MouseEventNe
 [System.Windows.Forms.SendKeys]::SendWait("%{TAB}")
 Start-Sleep -m 3000
 
-function createPhrase ($array, $chordMode) {
+function createPhrase ($lines, $array) {
     for ($i=0; $i -lt $notes; $i++){
+        [int] $num = Get-Random -Maximum $lines -Minimum 0
         [int] $x2 = $i * $xGap + $startX
-        [int] $y2
-        if ($chordMode) {
-            $num = Get-Random -Maximum $chordsArray.Length -Minimum 0
-            $y2 = $endY - ($yGap * $chordsArray[$num])
-        } else {
-            $num = Get-Random -Maximum $lines -Minimum 1
-            $y2 = $endY - ($yGap * $linesArray[$num-1])
-        }
+        [int] $y2 = $endY - ($yGap * $array[$num])
+        # if ($chordMode) {
+        #     $num = Get-Random -Maximum $chordsArray.Length -Minimum 0
+        #     $y2 = $endY - ($yGap * $chordsArray[$num])
+        # } else {
+        #     $num = Get-Random -Maximum $lines -Minimum 1
+        #     $y2 = $endY - ($yGap * $linesArray[$num-1])
+        # }
         
         # $y2 = $endY - ($yGap * $num)
         # [int] $y2 = $endY - ($yGap * $linesArray[$num-1])
@@ -87,7 +89,24 @@ function createPhrase ($array, $chordMode) {
     [System.Windows.Forms.SendKeys]::SendWait(" ")
 }
 
+for ($j=0; $j -lt $times; $j++){
+    # Wipe the old notes out
+    [System.Windows.Forms.SendKeys]::SendWait("^{a}")
+    Start-Sleep -m 3
+    [System.Windows.Forms.SendKeys]::SendWait("{DELETE}")
+    Start-Sleep -m 3
 
+    if ($chordMode) {
+        createPhrase $chordsArray.Length $chordsArray
+    } else {
+        createPhrase $linesArray.Length $linesArray
+    }
+
+    # the interval for playing once
+    Start-Sleep -m ((($tempo / 60) * $maxBar * 1000) + 50) 
+    [System.Windows.Forms.SendKeys]::SendWait(" ")
+    Start-Sleep -m 3
+}
 
 # -eq、 -ieq、 -ceq  ==
 # -ne、 -ine、 -cne  !=
